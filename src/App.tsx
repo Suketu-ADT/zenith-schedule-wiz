@@ -11,6 +11,11 @@ import LoginPage from './pages/auth/LoginPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import CreateTimetablePage from './pages/admin/CreateTimetablePage';
 import MasterTimetableViewPage from './pages/admin/MasterTimetableViewPage';
+import TeachersPage from './pages/admin/TeachersPage';
+import StudentsPage from './pages/admin/StudentsPage';
+import CoursesPage from './pages/admin/CoursesPage';
+import ClassroomsPage from './pages/admin/ClassroomsPage';
+import SettingsPage from './pages/admin/SettingsPage';
 import TeacherDashboardPage from './pages/teacher/TeacherDashboardPage';
 import StudentDashboardPage from './pages/student/StudentDashboardPage';
 import NotFound from "./pages/NotFound";
@@ -62,6 +67,46 @@ const App = () => (
                 element={
                   <ProtectedRoute allowedRoles={['admin']}>
                     <MasterTimetableViewPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="admin/teachers"
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <TeachersPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="admin/students"
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <StudentsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="admin/courses"
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <CoursesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="admin/classrooms"
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <ClassroomsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="admin/settings"
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <SettingsPage />
                   </ProtectedRoute>
                 }
               />
