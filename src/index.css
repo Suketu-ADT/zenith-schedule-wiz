@@ -1,42 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Professional Auto Scheduler Wiz Design System */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Professional Blue Theme */
+    --background: 210 40% 98%;  /* slate-50 equivalent */
+    --foreground: 215.4 16.3% 26.9%;  /* slate-800 equivalent */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;  /* Pure white for cards */
+    --card-foreground: 215.4 16.3% 26.9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 215.4 16.3% 26.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    /* Professional Blue Primary */
+    --primary: 221.2 83.2% 53.3%;  /* Professional blue */
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Subtle Secondary */
+    --secondary: 214.3 31.8% 91.4%;  /* Light gray */
+    --secondary-foreground: 215.4 16.3% 26.9%;
 
     --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted-foreground: 215.4 16.3% 46.9%;  /* slate-600 equivalent */
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 214.3 31.8% 91.4%;
+    --accent-foreground: 215.4 16.3% 26.9%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
+    --success: 142.1 76.2% 36.3%;  /* Green for success states */
+    --success-foreground: 355.7 100% 97.3%;
+
+    --warning: 32.5 94.6% 43.7%;  /* Orange for warnings */
+    --warning-foreground: 355.7 100% 97.3%;
+
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --ring: 221.2 83.2% 53.3%;
 
     --radius: 0.5rem;
+
+    /* Professional Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(221.2 83.2% 45%));
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(210 40% 95%));
+
+    /* Professional Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -2px hsl(0 0% 0% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -4px hsl(0 0% 0% / 0.1);
+    --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.1), 0 8px 10px -6px hsl(0 0% 0% / 0.1);
+
+    /* Animation Variables */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s ease-out;
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +123,65 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+  /* Professional Component Variants */
+  .stat-card {
+    @apply bg-card rounded-lg border border-border p-6 transition-all duration-200 hover:shadow-md;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .stat-card:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .page-header {
+    @apply bg-card border-b border-border px-6 py-4 flex items-center justify-between;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .timetable-slot {
+    @apply bg-card rounded-md border border-border p-3 text-sm transition-all duration-200 hover:shadow-sm;
+  }
+
+  .timetable-slot.conflict {
+    @apply border-destructive border-2;
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors;
+  }
+
+  .sidebar-item.active {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .sidebar-item:not(.active) {
+    @apply text-muted-foreground hover:bg-accent hover:text-accent-foreground;
+  }
+
+  .data-table-header {
+    @apply bg-muted/50 text-muted-foreground font-medium;
+  }
+
+  .wizard-step {
+    @apply flex items-center gap-2 px-4 py-2 rounded-md transition-colors;
+  }
+
+  .wizard-step.active {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .wizard-step.completed {
+    @apply bg-success text-success-foreground;
+  }
+
+  .wizard-step:not(.active):not(.completed) {
+    @apply bg-muted text-muted-foreground;
   }
 }

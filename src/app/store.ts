@@ -1,0 +1,19 @@
+import { configureStore } from '@reduxjs/toolkit';
+import authReducer from '../features/auth/authSlice';
+import timetableReducer from '../features/timetable/timetableSlice';
+
+export const store = configureStore({
+  reducer: {
+    auth: authReducer,
+    timetable: timetableReducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST'],
+      },
+    }),
+});
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
