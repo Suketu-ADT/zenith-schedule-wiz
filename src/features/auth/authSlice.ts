@@ -5,21 +5,21 @@ import type { AuthState, User, LoginForm } from '../../types';
 const mockUsers: User[] = [
   {
     id: '1',
-    name: 'Dr. Sarah Johnson',
+    name: 'Dr. Priya Sharma',
     email: 'admin@scheduler.com',
     role: 'admin',
     avatarUrl: undefined,
   },
   {
     id: '2',
-    name: 'Prof. Michael Chen',
+    name: 'Prof. Rajesh Kumar',
     email: 'teacher@scheduler.com',
     role: 'teacher',
     avatarUrl: undefined,
   },
   {
     id: '3',
-    name: 'Alice Williams',
+    name: 'Anjali Patel',
     email: 'student@scheduler.com',
     role: 'student',
     avatarUrl: undefined,
