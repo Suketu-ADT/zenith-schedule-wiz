@@ -37,6 +37,7 @@ const Sidebar = () => {
         return [
           { name: 'Dashboard', href: '/teacher/dashboard', icon: LayoutDashboard },
           { name: 'My Schedule', href: '/teacher/schedule', icon: Calendar },
+          { name: 'Availability', href: '/teacher/availability', icon: Clock },
           { name: 'My Courses', href: '/teacher/courses', icon: BookOpen },
           { name: 'Class Lists', href: '/teacher/class-lists', icon: ClipboardList },
           { name: 'Settings', href: '/teacher/settings', icon: Settings },

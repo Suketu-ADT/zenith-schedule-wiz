@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { 
   BookOpen, 
   Calendar,
@@ -7,13 +8,17 @@ import {
   GraduationCap,
   CheckCircle,
   AlertCircle,
-  MapPin
+  MapPin,
+  TrendingUp
 } from 'lucide-react';
 import PageHeader from '../../components/layout/PageHeader';
 import StatCard from '../../components/common/StatCard';
 import TimetableView from '../../components/timetable/TimetableView';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
+import { Button } from '../../components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Progress } from '../../components/ui/progress';
 import { loadTimetableData } from '../../features/timetable/timetableSlice';
 import type { RootState, AppDispatch } from '../../app/store';
 
@@ -32,9 +37,43 @@ const StudentDashboardPage = () => {
     slot.studentGroups.some(group => studentGroups.includes(group))
   );
 
-  // Get today's classes
+  // Get today's classes and upcoming days
   const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
   const todaySlots = studentSlots.filter(slot => slot.dayOfWeek === (today === 0 ? 6 : today - 1));
+  
+  // Mock upcoming assignments data
+  const upcomingAssignments = [
+    {
+      course: 'Data Structures',
+      assignment: 'Binary Tree Implementation',
+      deadline: 'Due tomorrow',
+      priority: 'high',
+    },
+    {
+      course: 'Database Systems',
+      assignment: 'ER Diagram Project',
+      deadline: 'Due in 3 days',
+      priority: 'medium',
+    },
+    {
+      course: 'Linear Algebra',
+      assignment: 'Matrix Operations',
+      deadline: 'Due next week',
+      priority: 'low',
+    },
+  ];
+
+  // Get upcoming deadlines (within next week)
+  const upcomingDeadlines = upcomingAssignments.filter(assignment => 
+    assignment.deadline.includes('tomorrow') || assignment.deadline.includes('3 days')
+  ).length;
+
+  // Get slots for next few days
+  const getNextDaySlots = (daysFromToday: number) => {
+    const dayIndex = (today + daysFromToday) % 7;
+    const adjustedIndex = dayIndex === 0 ? 6 : dayIndex - 1;
+    return studentSlots.filter(slot => slot.dayOfWeek === adjustedIndex);
+  };
 
   // Student stats
   const studentStats = [
@@ -58,6 +97,13 @@ const StudentDashboardPage = () => {
       icon: GraduationCap,
       description: 'Total this semester',
       color: 'text-purple-600',
+    },
+    {
+      title: 'Upcoming Deadlines',
+      value: upcomingDeadlines,
+      icon: AlertCircle,
+      description: 'Due within next week',
+      color: 'text-red-600',
     },
     {
       title: 'Attendance',
@@ -101,26 +147,7 @@ const StudentDashboardPage = () => {
     },
   ];
 
-  const upcomingAssignments = [
-    {
-      course: 'Data Structures',
-      assignment: 'Binary Tree Implementation',
-      deadline: 'Due tomorrow',
-      priority: 'high',
-    },
-    {
-      course: 'Database Systems',
-      assignment: 'ER Diagram Project',
-      deadline: 'Due in 3 days',
-      priority: 'medium',
-    },
-    {
-      course: 'Linear Algebra',
-      assignment: 'Matrix Operations',
-      deadline: 'Due next week',
-      priority: 'low',
-    },
-  ];
+  // This data is already defined above, so removing duplicate
 
   return (
     <div className="p-6 space-y-6">
@@ -130,7 +157,7 @@ const StudentDashboardPage = () => {
       />
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {studentStats.map((stat) => (
           <StatCard
             key={stat.title}
@@ -143,53 +170,106 @@ const StudentDashboardPage = () => {
         ))}
       </div>
 
-      {/* Today's Schedule */}
+      {/* My Week Ahead */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5" />
-            Today's Classes
+            <Calendar className="h-5 w-5" />
+            My Week Ahead
           </CardTitle>
           <CardDescription>
-            Your schedule for today, {new Date().toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
+            Your schedule for the upcoming days
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {todaySlots.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {todaySlots.map((slot) => (
-                <Card key={slot.id} className="timetable-slot">
-                  <CardContent className="p-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Badge variant="secondary">{slot.courseCode}</Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {slot.startTime} - {slot.endTime}
-                        </span>
+          <Tabs defaultValue="today" className="w-full">
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="today">Today</TabsTrigger>
+              <TabsTrigger value="tomorrow">Tomorrow</TabsTrigger>
+              <TabsTrigger value="day2">Day +2</TabsTrigger>
+              <TabsTrigger value="day3">Day +3</TabsTrigger>
+              <TabsTrigger value="day4">Day +4</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="today" className="mt-4">
+              {todaySlots.length > 0 ? (
+                <div className="space-y-3">
+                  {todaySlots.map((slot) => (
+                    <div key={slot.id} className="flex items-center justify-between p-3 rounded-lg border border-border">
+                      <div>
+                        <h4 className="font-medium">{slot.courseName}</h4>
+                        <p className="text-sm text-muted-foreground">{slot.classroomName}</p>
                       </div>
-                      <h4 className="font-medium">{slot.courseName}</h4>
-                      <p className="text-sm text-muted-foreground">{slot.teacherName}</p>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <MapPin className="h-3 w-3" />
-                        {slot.classroomName}
+                      <div className="text-right">
+                        <p className="text-sm font-medium">{slot.startTime}</p>
+                        <Badge variant="secondary" className="text-xs">{slot.courseCode}</Badge>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-muted-foreground py-8">No classes today</p>
+              )}
+            </TabsContent>
+            
+            {[1, 2, 3, 4].map((day) => (
+              <TabsContent key={day} value={day === 1 ? 'tomorrow' : `day${day}`} className="mt-4">
+                {(() => {
+                  const daySlots = getNextDaySlots(day);
+                  return daySlots.length > 0 ? (
+                    <div className="space-y-3">
+                      {daySlots.map((slot) => (
+                        <div key={slot.id} className="flex items-center justify-between p-3 rounded-lg border border-border">
+                          <div>
+                            <h4 className="font-medium">{slot.courseName}</h4>
+                            <p className="text-sm text-muted-foreground">{slot.classroomName}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-medium">{slot.startTime}</p>
+                            <Badge variant="secondary" className="text-xs">{slot.courseCode}</Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">No classes scheduled</p>
+                  );
+                })()}
+              </TabsContent>
+            ))}
+          </Tabs>
+        </CardContent>
+      </Card>
+
+      {/* Academic Progress Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5" />
+            My Academic Progress
+          </CardTitle>
+          <CardDescription>
+            Track your credit completion across different course categories
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {[
+            { type: 'Major Courses', earned: 45, total: 60, color: 'bg-primary' },
+            { type: 'Minor Courses', earned: 12, total: 18, color: 'bg-secondary' },
+            { type: 'General Education', earned: 30, total: 36, color: 'bg-accent' },
+            { type: 'Electives', earned: 9, total: 12, color: 'bg-muted' }
+          ].map((category) => (
+            <div key={category.type} className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium">{category.type}</span>
+                <span className="text-muted-foreground">{category.earned}/{category.total} credits</span>
+              </div>
+              <Progress value={(category.earned / category.total) * 100} className="h-2" />
             </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No classes scheduled for today</p>
-              <p className="text-sm">Enjoy your free day!</p>
-            </div>
-          )}
+          ))}
+          <Button asChild className="w-full mt-4">
+            <Link to="/student/course-catalog">Explore & Enroll in Courses</Link>
+          </Button>
         </CardContent>
       </Card>
 

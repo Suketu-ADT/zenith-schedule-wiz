@@ -17,6 +17,7 @@ import CoursesPage from './pages/admin/CoursesPage';
 import ClassroomsPage from './pages/admin/ClassroomsPage';
 import SettingsPage from './pages/admin/SettingsPage';
 import TeacherDashboardPage from './pages/teacher/TeacherDashboardPage';
+import AvailabilityPage from './pages/teacher/AvailabilityPage';
 import StudentDashboardPage from './pages/student/StudentDashboardPage';
 import NotFound from "./pages/NotFound";
 
@@ -120,6 +121,14 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="teacher/availability"
+                element={
+                  <ProtectedRoute allowedRoles={['teacher']}>
+                    <AvailabilityPage />
+                  </ProtectedRoute>
+                }
+              />
               
               {/* Student routes */}
               <Route
@@ -127,6 +136,14 @@ const App = () => (
                 element={
                   <ProtectedRoute allowedRoles={['student']}>
                     <StudentDashboardPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="student/course-catalog"
+                element={
+                  <ProtectedRoute allowedRoles={['student']}>
+                    <div className="p-8 text-center text-muted-foreground">Course Catalog - Coming Soon</div>
                   </ProtectedRoute>
                 }
               />

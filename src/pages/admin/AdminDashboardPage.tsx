@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { 
   Users, 
   BookOpen, 
@@ -26,6 +27,10 @@ const AdminDashboardPage = () => {
   useEffect(() => {
     dispatch(loadTimetableData('admin'));
   }, [dispatch]);
+
+  // Get today's classes
+  const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
+  const todaySlots = timetableSlots.filter(slot => slot.dayOfWeek === (today === 0 ? 6 : today - 1));
 
   const statsData = [
     {
@@ -109,26 +114,84 @@ const AdminDashboardPage = () => {
         title={`Welcome back, ${user?.name?.split(' ')[0] || 'Admin'}`}
         subtitle="Here's an overview of your institution's scheduling system"
         actions={
-          <Button>
-            Generate New Timetable
-          </Button>
+          stats ? (
+            <Button asChild>
+              <Link to="/admin/master-timetable">View Master Timetable</Link>
+            </Button>
+          ) : (
+            <Button asChild>
+              <Link to="/admin/create-timetable">Create New Timetable</Link>
+            </Button>
+          )
         }
       />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {statsData.map((stat) => (
-          <StatCard
-            key={stat.title}
-            title={stat.title}
-            value={stat.value}
-            icon={stat.icon}
-            description={stat.description}
-            trend={stat.trend}
-            color={stat.color}
-          />
-        ))}
+        {statsData.map((stat) => {
+          const getStatLink = (title: string) => {
+            switch (title) {
+              case 'Total Students': return '/admin/students';
+              case 'Active Courses': return '/admin/courses';
+              case 'Teaching Staff': return '/admin/teachers';
+              case 'Classrooms': return '/admin/classrooms';
+              default: return '#';
+            }
+          };
+
+          const statLink = getStatLink(stat.title);
+          const isClickable = statLink !== '#';
+
+          return isClickable ? (
+            <Link key={stat.title} to={statLink} className="block">
+              <StatCard
+                title={stat.title}
+                value={stat.value}
+                icon={stat.icon}
+                description={stat.description}
+                trend={stat.trend}
+                color={stat.color}
+              />
+            </Link>
+          ) : (
+            <StatCard
+              key={stat.title}
+              title={stat.title}
+              value={stat.value}
+              icon={stat.icon}
+              description={stat.description}
+              trend={stat.trend}
+              color={stat.color}
+            />
+          );
+        })}
       </div>
+
+      {/* Today's Schedule Preview */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="h-5 w-5" />
+            Today's Schedule Preview
+          </CardTitle>
+          <CardDescription>
+            Classes scheduled for today, {new Date().toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <TimetableView 
+            slots={todaySlots} 
+            isLoading={isLoading}
+            showFilters={false}
+            userRole="admin"
+          />
+        </CardContent>
+      </Card>
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
