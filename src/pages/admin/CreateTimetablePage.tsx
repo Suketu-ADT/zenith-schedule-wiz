@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import PageHeader from '../../components/layout/PageHeader';
 import DataTable, { Column } from '../../components/common/DataTable';
+import TimetableView from '../../components/timetable/TimetableView';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
@@ -35,7 +36,7 @@ import {
   removeStudent
 } from '../../features/timetable/timetableSlice';
 import type { RootState, AppDispatch } from '../../app/store';
-import type { Course, Teacher, Classroom, Student } from '../../types';
+import type { Course, Teacher, Classroom, Student, TimetableSlot } from '../../types';
 
 const steps = [
   { id: 1, name: 'Basic Info', icon: Calendar },
@@ -44,6 +45,7 @@ const steps = [
   { id: 4, name: 'Classrooms', icon: Building },
   { id: 5, name: 'Students', icon: Users },
   { id: 6, name: 'Generate', icon: Check },
+  { id: 7, name: 'Review', icon: Calendar },
 ];
 
 // Form schemas
@@ -80,7 +82,7 @@ const studentSchema = z.object({
 const CreateTimetablePage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { toast } = useToast();
-  const { activeConfig, isGenerating } = useSelector((state: RootState) => state.timetable);
+  const { activeConfig, isGenerating, timetableSlots, stats } = useSelector((state: RootState) => state.timetable);
   
   const [currentStep, setCurrentStep] = useState(1);
   const [mockData, setMockData] = useState({
@@ -218,6 +220,7 @@ const CreateTimetablePage = () => {
 
     try {
       await dispatch(generateTimetable('mock-config-id')).unwrap();
+      setCurrentStep(7); // Move to review step
       toast({
         title: 'Timetable generated successfully!',
         description: 'Your new timetable is ready for review.',
@@ -514,6 +517,80 @@ const CreateTimetablePage = () => {
           </div>
         );
 
+      case 7:
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <h3 className="text-lg font-medium mb-2">Generated Timetable</h3>
+              <p className="text-muted-foreground">
+                Here's your AI-generated timetable based on the data you entered
+              </p>
+            </div>
+
+            {stats && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <BookOpen className="h-6 w-6 mx-auto mb-2 text-primary" />
+                    <p className="text-xl font-bold">{stats.totalCourses}</p>
+                    <p className="text-xs text-muted-foreground">Total Courses</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <Users className="h-6 w-6 mx-auto mb-2 text-green-600" />
+                    <p className="text-xl font-bold">{stats.utilizationRate}%</p>
+                    <p className="text-xs text-muted-foreground">Utilization</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <Building className="h-6 w-6 mx-auto mb-2 text-blue-600" />
+                    <p className="text-xl font-bold">{stats.totalClassrooms}</p>
+                    <p className="text-xs text-muted-foreground">Classrooms</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 text-center">
+                    <UserCheck className="h-6 w-6 mx-auto mb-2 text-orange-600" />
+                    <p className="text-xl font-bold">{stats.conflictCount}</p>
+                    <p className="text-xs text-muted-foreground">Conflicts</p>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Generated Timetable</CardTitle>
+                <CardDescription>
+                  Review your generated timetable and make adjustments if needed
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <TimetableView 
+                  slots={timetableSlots} 
+                  isLoading={isGenerating}
+                  showFilters={true}
+                  userRole="admin"
+                />
+              </CardContent>
+            </Card>
+
+            <div className="flex gap-4 justify-center">
+              <Button 
+                variant="outline" 
+                onClick={() => setCurrentStep(6)}
+              >
+                Back to Configure
+              </Button>
+              <Button>
+                Save Timetable
+              </Button>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -565,8 +642,8 @@ const CreateTimetablePage = () => {
           Previous
         </Button>
         <Button
-          onClick={() => setCurrentStep(Math.min(6, currentStep + 1))}
-          disabled={currentStep === 6}
+          onClick={() => setCurrentStep(Math.min(7, currentStep + 1))}
+          disabled={currentStep === 7}
         >
           Next
         </Button>
