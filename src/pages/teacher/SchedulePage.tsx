@@ -13,7 +13,7 @@ const SchedulePage = () => {
   const { timetableSlots, isLoading } = useSelector((state: RootState) => state.timetable);
 
   useEffect(() => {
-    dispatch(loadTimetableData({}));
+    dispatch(loadTimetableData('teacher'));
   }, [dispatch]);
 
   // Filter teacher's schedule

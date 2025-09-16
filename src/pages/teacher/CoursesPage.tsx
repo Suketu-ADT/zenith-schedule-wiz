@@ -17,7 +17,7 @@ const CoursesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    dispatch(loadTimetableData({}));
+    dispatch(loadTimetableData('teacher'));
   }, [dispatch]);
 
   // Mock teacher's courses data
