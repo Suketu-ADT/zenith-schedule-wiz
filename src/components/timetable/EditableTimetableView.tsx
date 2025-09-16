@@ -144,22 +144,25 @@ const EditableTimetableView: React.FC<EditableTimetableViewProps> = ({
     if (draggedSlot) {
       const existingSlot = getSlotForTimeAndDay(dayIndex, time);
       if (!existingSlot) {
+        const endTimeIndex = timeSlots.indexOf(time) + 1;
+        const endTime = endTimeIndex < timeSlots.length ? timeSlots[endTimeIndex] : '19:00';
+        
         const updatedSlot = {
           ...draggedSlot,
           dayOfWeek: dayIndex,
           startTime: time,
-          endTime: time === '18:00' ? '19:00' : timeSlots[timeSlots.indexOf(time) + 1] || '19:00'
+          endTime: endTime
         };
         onUpdateSlot(updatedSlot);
         toast({
-          title: 'Slot moved',
-          description: 'The class has been moved to the new time slot.',
+          title: 'Class moved',
+          description: `Moved to ${days[dayIndex]} at ${time}`,
         });
       } else {
         toast({
           variant: 'destructive',
           title: 'Cannot move',
-          description: 'The target time slot is already occupied.',
+          description: 'Time slot is already occupied',
         });
       }
       setDraggedSlot(null);
@@ -211,12 +214,12 @@ const EditableTimetableView: React.FC<EditableTimetableViewProps> = ({
                 value={editingData.courseId} 
                 onValueChange={(value) => setEditingData(prev => ({ ...prev, courseId: value }))}
               >
-                <SelectTrigger className="h-8">
-                  <SelectValue />
+                <SelectTrigger className="h-8 bg-background">
+                  <SelectValue placeholder="Select course" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-50 bg-background border border-border">
                   {courses.map(course => (
-                    <SelectItem key={course.id} value={course.id}>
+                    <SelectItem key={`course-${course.id}`} value={course.id}>
                       {course.code} - {course.name}
                     </SelectItem>
                   ))}
@@ -227,12 +230,12 @@ const EditableTimetableView: React.FC<EditableTimetableViewProps> = ({
                 value={editingData.teacherId} 
                 onValueChange={(value) => setEditingData(prev => ({ ...prev, teacherId: value }))}
               >
-                <SelectTrigger className="h-8">
-                  <SelectValue />
+                <SelectTrigger className="h-8 bg-background">
+                  <SelectValue placeholder="Select teacher" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-50 bg-background border border-border">
                   {teachers.map(teacher => (
-                    <SelectItem key={teacher.id} value={teacher.id}>
+                    <SelectItem key={`teacher-${teacher.id}`} value={teacher.id}>
                       {teacher.name}
                     </SelectItem>
                   ))}
@@ -243,12 +246,12 @@ const EditableTimetableView: React.FC<EditableTimetableViewProps> = ({
                 value={editingData.classroomId} 
                 onValueChange={(value) => setEditingData(prev => ({ ...prev, classroomId: value }))}
               >
-                <SelectTrigger className="h-8">
-                  <SelectValue />
+                <SelectTrigger className="h-8 bg-background">
+                  <SelectValue placeholder="Select classroom" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-50 bg-background border border-border">
                   {classrooms.map(classroom => (
-                    <SelectItem key={classroom.id} value={classroom.id}>
+                    <SelectItem key={`classroom-${classroom.id}`} value={classroom.id}>
                       {classroom.name}
                     </SelectItem>
                   ))}
@@ -393,12 +396,12 @@ const EditableTimetableView: React.FC<EditableTimetableViewProps> = ({
               <div>
                 <Label>Day</Label>
                 <Select value={addSlotData.dayOfWeek.toString()} onValueChange={(value) => setAddSlotData(prev => ({ ...prev, dayOfWeek: parseInt(value) }))}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-background">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-50 bg-background border border-border">
                     {days.slice(0, 7).map((day, index) => (
-                      <SelectItem key={index} value={index.toString()}>
+                      <SelectItem key={`day-${index}`} value={index.toString()}>
                         {day}
                       </SelectItem>
                     ))}
@@ -409,12 +412,12 @@ const EditableTimetableView: React.FC<EditableTimetableViewProps> = ({
               <div>
                 <Label>Time</Label>
                 <Select value={addSlotData.startTime} onValueChange={(value) => setAddSlotData(prev => ({ ...prev, startTime: value }))}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-background">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-50 bg-background border border-border">
                     {timeSlots.map(time => (
-                      <SelectItem key={time} value={time}>
+                      <SelectItem key={`time-${time}`} value={time}>
                         {time}
                       </SelectItem>
                     ))}
@@ -425,12 +428,12 @@ const EditableTimetableView: React.FC<EditableTimetableViewProps> = ({
               <div>
                 <Label>Course</Label>
                 <Select value={addSlotData.courseId} onValueChange={(value) => setAddSlotData(prev => ({ ...prev, courseId: value }))}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-background">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-50 bg-background border border-border">
                     {courses.map(course => (
-                      <SelectItem key={course.id} value={course.id}>
+                      <SelectItem key={`add-course-${course.id}`} value={course.id}>
                         {course.code} - {course.name}
                       </SelectItem>
                     ))}
@@ -441,12 +444,12 @@ const EditableTimetableView: React.FC<EditableTimetableViewProps> = ({
               <div>
                 <Label>Teacher</Label>
                 <Select value={addSlotData.teacherId} onValueChange={(value) => setAddSlotData(prev => ({ ...prev, teacherId: value }))}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-background">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-50 bg-background border border-border">
                     {teachers.map(teacher => (
-                      <SelectItem key={teacher.id} value={teacher.id}>
+                      <SelectItem key={`add-teacher-${teacher.id}`} value={teacher.id}>
                         {teacher.name}
                       </SelectItem>
                     ))}
@@ -457,12 +460,12 @@ const EditableTimetableView: React.FC<EditableTimetableViewProps> = ({
               <div>
                 <Label>Classroom</Label>
                 <Select value={addSlotData.classroomId} onValueChange={(value) => setAddSlotData(prev => ({ ...prev, classroomId: value }))}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-background">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-50 bg-background border border-border">
                     {classrooms.map(classroom => (
-                      <SelectItem key={classroom.id} value={classroom.id}>
+                      <SelectItem key={`add-classroom-${classroom.id}`} value={classroom.id}>
                         {classroom.name}
                       </SelectItem>
                     ))}
@@ -508,14 +511,16 @@ const EditableTimetableView: React.FC<EditableTimetableViewProps> = ({
                   const slot = getSlotForTimeAndDay(dayIndex, time);
                   return (
                     <div 
-                      key={`${day}-${time}`} 
-                      className="p-2 border-b border-l border-border min-h-[80px] drop-zone"
+                      key={`${day}-${time}-${dayIndex}`} 
+                      className={`p-2 border-b border-l border-border min-h-[120px] transition-colors ${
+                        draggedSlot ? 'hover:bg-muted/50' : ''
+                      }`}
                       onDragOver={handleDragOver}
                       onDrop={(e) => handleDrop(e, dayIndex, time)}
                     >
                       {slot ? renderSlotCard(slot) : (
-                        <div className="h-full flex items-center justify-center text-muted-foreground text-xs border-2 border-dashed border-muted rounded-md">
-                          Drop here
+                        <div className="h-full flex items-center justify-center text-muted-foreground text-xs border-2 border-dashed border-muted rounded-md opacity-0 hover:opacity-100 transition-opacity">
+                          {draggedSlot ? 'Drop here' : '+ Add class'}
                         </div>
                       )}
                     </div>
