@@ -16,6 +16,7 @@ import {
 import PageHeader from '../../components/layout/PageHeader';
 import DataTable, { Column } from '../../components/common/DataTable';
 import TimetableView from '../../components/timetable/TimetableView';
+import EditableTimetableView from '../../components/timetable/EditableTimetableView';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
@@ -232,6 +233,40 @@ const CreateTimetablePage = () => {
         description: error as string,
       });
     }
+  };
+
+  const handleUpdateSlot = (updatedSlot: TimetableSlot) => {
+    // Update slot in the timetable - this would typically update the Redux store
+    console.log('Updating slot:', updatedSlot);
+    // For now, just show a toast as this is mock data
+    toast({
+      title: 'Slot updated',
+      description: 'The class has been updated successfully.',
+    });
+  };
+
+  const handleDeleteSlot = (slotId: string) => {
+    // Delete slot from the timetable - this would typically update the Redux store
+    console.log('Deleting slot:', slotId);
+    // For now, just show a toast as this is mock data
+    toast({
+      title: 'Slot deleted',
+      description: 'The class has been removed from the timetable.',
+    });
+  };
+
+  const handleAddSlot = (newSlot: Omit<TimetableSlot, 'id'>) => {
+    // Add new slot to the timetable - this would typically update the Redux store
+    const slotWithId = {
+      ...newSlot,
+      id: `slot-${Date.now()}`,
+    };
+    console.log('Adding slot:', slotWithId);
+    // For now, just show a toast as this is mock data
+    toast({
+      title: 'Slot added',
+      description: 'New class has been added to the timetable.',
+    });
   };
 
   const renderStepContent = () => {
@@ -564,15 +599,19 @@ const CreateTimetablePage = () => {
               <CardHeader>
                 <CardTitle>Generated Timetable</CardTitle>
                 <CardDescription>
-                  Review your generated timetable and make adjustments if needed
+                  Review and edit your generated timetable. You can drag classes to move them, edit details, or add new classes.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <TimetableView 
-                  slots={timetableSlots} 
+                <EditableTimetableView
+                  slots={timetableSlots}
+                  courses={mockData.courses}
+                  teachers={mockData.teachers}
+                  classrooms={mockData.classrooms}
+                  onUpdateSlot={handleUpdateSlot}
+                  onDeleteSlot={handleDeleteSlot}
+                  onAddSlot={handleAddSlot}
                   isLoading={isGenerating}
-                  showFilters={true}
-                  userRole="admin"
                 />
               </CardContent>
             </Card>
